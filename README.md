@@ -1,4 +1,4 @@
-istem Pengajuan Dana Karyawan (SPK)
+Sistem Pengajuan Dana Karyawan (SPK)
 
 Aplikasi web untuk pengajuan dana karyawan berbasis Decision Support System (SPK) menggunakan metode Weighted Product.
 Sistem dirancang menyerupai aplikasi internal perusahaan dengan alur lengkap dari pengajuan, penilaian, hingga pengelolaan pinjaman.
