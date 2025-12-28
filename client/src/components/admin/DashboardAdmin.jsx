@@ -1,45 +1,44 @@
-import React from "react";
-import { Home, FileText, ClipboardList, LogOut, KeyIcon } from "lucide-react";
-import { Link } from "react-router-dom";
-import LogoJNT from "../../assets/LogoJNT.png";
+import React from 'react';
+import { Home, FileText, ClipboardList, LogOut, KeyIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import LogoJNT from '../../assets/LogoJNT.png';
 
-function DashboardAdminClean() {
-  const merahJnt = "#C21807";
- 
+function DashboardAdmin() {
+  const merahJnt = '#C21807';
 
   const menuItems = [
-    { to: "/admin", icon: <Home size={36} />, label: "Dashboard" },
+    { to: '/admin', icon: <Home size={36} />, label: 'Dashboard' },
     {
-      to: "/admin/daftar-pengajuan",
+      to: '/admin/daftar-pengajuan',
       icon: <FileText size={36} />,
-      label: "Daftar Pengajuan",
+      label: 'Daftar Pengajuan',
     },
     {
-      to: "/admin/riwayat",
+      to: '/admin/riwayat',
       icon: <FileText size={36} />,
-      label: "Riwayat Pengajuan",
+      label: 'Riwayat Pengajuan',
     },
     {
-      to: "/admin/valid-id",
+      to: '/admin/valid-id',
       icon: <ClipboardList size={36} />,
-      label: "Admin Valid ID",
+      label: 'Admin Valid ID',
     },
     {
-      to: "/admin/kelola-pinjaman",
+      to: '/admin/kelola-pinjaman',
       icon: <ClipboardList size={36} />,
-      label: "Kelola Pinjaman",
+      label: 'Kelola Pinjaman',
     },
     {
-      to: "/admin/laporan-bulanan",
+      to: '/admin/laporan-bulanan',
       icon: <FileText size={36} />,
-      label: "Laporan Bulanan",
+      label: 'Laporan Bulanan',
     },
     {
-      to: "/admin/lupa-password",
+      to: '/admin/lupa-password',
       icon: <KeyIcon size={36} />,
-      label: "Daftar Lupa Password",
+      label: 'Daftar Lupa Password',
     },
-    { to: "/", icon: <LogOut size={36} />, label: "Logout" },
+    { to: '/', icon: <LogOut size={36} />, label: 'Logout' },
   ];
 
   return (
@@ -61,7 +60,7 @@ function DashboardAdminClean() {
             >
               <div
                 className="mb-3 p-4 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: merahJnt, color: "white" }}
+                style={{ backgroundColor: merahJnt, color: 'white' }}
               >
                 {item.icon}
               </div>
@@ -82,4 +81,4 @@ function DashboardAdminClean() {
   );
 }
 
-export default DashboardAdminClean;
+export default DashboardAdmin;
