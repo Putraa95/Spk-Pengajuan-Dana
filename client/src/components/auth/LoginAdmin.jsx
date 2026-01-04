@@ -10,13 +10,16 @@ function LoginAdmin() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
-        idKaryawan,
-        password,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        {
+          idKaryawan,
+          password,
+        }
+      );
 
       const userData = res.data.user;
-      const token = res.data.token; // pastikan backend mengirim token JWT
+      const token = res.data.token;
 
       if (!userData) {
         alert('❌ Login gagal: user tidak ditemukan');
@@ -28,11 +31,10 @@ function LoginAdmin() {
         return;
       }
 
-      // Simpan user + token di localStorage
       localStorage.setItem('user', JSON.stringify({ ...userData, token }));
 
       alert(res.data.message || '✅ Login admin berhasil!');
-      navigate('/admin'); // arahkan ke halaman admin
+      navigate('/admin');
     } catch (err) {
       alert('❌ Login gagal: ' + (err.response?.data?.message || err.message));
     }
