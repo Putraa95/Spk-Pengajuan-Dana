@@ -2,52 +2,60 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 
 // ================== MIDDLEWARE ==================
-app.use(cors());
+app.use(
+  cors({
+    origin: '*', // aman dulu, nanti bisa dikunci ke domain Vercel
+  })
+);
 app.use(express.json());
 
-// ================== IMPORT ROUTES ==================
-const authRoutes = require('./routes/auth.routes'); // login, register, reset, lupa password
-const pengajuanRoutes = require('./routes/pengajuan.routes');
-const laporanRoutes = require('./routes/laporan.routes'); // laporan bulanan & update cicilan
-const adminValidIdRoutes = require('./routes/adminValidId.routes');
-const lupaPasswordRoutes = require('./routes/lupaPassword.routes');
-const pinjamanRoutes = require('./routes/pinjaman.routes'); // pinjaman & update cicilan
+// ================== ROUTES ==================
+app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/pengajuan', require('./routes/pengajuan.routes'));
+app.use('/api/laporan-bulanan', require('./routes/laporan.routes'));
+app.use('/api/admin', require('./routes/adminValidId.routes'));
+app.use('/api/lupa-password', require('./routes/lupaPassword.routes'));
+app.use('/api/pinjaman', require('./routes/pinjaman.routes'));
 
-// ================== USE ROUTES ==================
-app.use('/api/auth', authRoutes);
-app.use('/api/pengajuan', pengajuanRoutes);
-app.use('/api/laporan-bulanan', laporanRoutes); // untuk laporan bulanan
-app.use('/api/admin', adminValidIdRoutes);
-app.use('/api/lupa-password', lupaPasswordRoutes);
-app.use('/api/pinjaman', pinjamanRoutes); // endpoint pinjaman
+// ================== ROOT CHECK ==================
+app.get('/', (req, res) => {
+  res.send('✅ API SPK Pengajuan Dana aktif');
+});
 
-// ================== ROOT ==================
-app.get('/', (req, res) => res.send('✅ API berjalan'));
+// ================== 404 HANDLER ==================
+app.use((req, res) => {
+  res.status(404).json({ message: '❌ Endpoint tidak ditemukan' });
+});
 
-// ================== ERROR HANDLING ==================
-app.use((req, res) =>
-  res.status(404).json({ message: '❌ Endpoint tidak ditemukan' })
-);
-
+// ================== ERROR HANDLER ==================
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ message: '❌ Internal Server Error' });
 });
 
-// ================== MONGODB CONNECT ==================
-const MONGO_URI = 'mongodb://127.0.0.1:27017/pengajuan_dana';
+// ================== DATABASE ==================
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  console.error('❌ MONGO_URI belum diset di environment!');
+  process.exit(1);
+}
 
 mongoose
-  .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+  .connect(MONGO_URI)
+  .then(() => console.log('✅ MongoDB Atlas connected'))
+  .catch((err) => {
+    console.error('❌ MongoDB connection error:', err);
+    process.exit(1);
+  });
 
 // ================== START SERVER ==================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
-  console.log(`🚀 Server running at http://localhost:${PORT}`)
-);
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
