@@ -50,14 +50,14 @@ export const createPinjaman = async (req, res) => {
       return res.status(404).json({ message: 'Pengajuan tidak ditemukan' });
     }
 
-    // Gunakan user dari pengajuan (karyawan yg meminjam)
+    // Gunakan user dari pengajuan
     const pinjaman = new Pinjaman({
-      user: pengajuan.user, // ✅ BUKAN req.user !!!
+      user: pengajuan.user,
       pengajuan: pengajuan._id,
       nominal,
       tenor,
       cicilanPerBulan,
-      status: 'Berjalan', // atau "Disetujui" tergantung alur kamu
+      status: 'Berjalan',
     });
 
     await pinjaman.save();

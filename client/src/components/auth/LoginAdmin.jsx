@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../../loginAdmin.css';
 
 function LoginAdmin() {
   const [idKaryawan, setIdKaryawan] = useState('');
@@ -9,6 +10,7 @@ function LoginAdmin() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/login`,
@@ -30,20 +32,40 @@ function LoginAdmin() {
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <input
-        value={idKaryawan}
-        onChange={(e) => setIdKaryawan(e.target.value)}
-        placeholder="ID Admin"
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-      />
-      <button type="submit">Login</button>
-    </form>
+    <div className="login-container">
+      <div className="login-card">
+        <h2>Login Admin</h2>
+        <p className="login-subtitle">Sistem Pengajuan Dana Karyawan</p>
+
+        <form onSubmit={handleLogin}>
+          <div className="input-group">
+            <label>ID Admin</label>
+            <input
+              type="text"
+              value={idKaryawan}
+              onChange={(e) => setIdKaryawan(e.target.value)}
+              placeholder="Masukkan ID Admin"
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Masukkan Password"
+              required
+            />
+          </div>
+
+          <button type="submit" className="login-btn">
+            Login
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }
 
