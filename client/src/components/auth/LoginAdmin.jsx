@@ -60,7 +60,10 @@ function LoginAdmin() {
             />
           </div>
 
-          <button type="submit" className="login-btn">
+          <button
+            type="submit"
+            className="text-[#8B0000] hover:text-red-700 cursor-pointer font-semibold"
+          >
             Login
           </button>
         </form>
