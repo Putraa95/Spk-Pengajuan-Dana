@@ -4,7 +4,12 @@ import { useNavigate } from "react-router-dom";
 
 const AdminValidId = () => {
   const [list, setList] = useState([]);
+
   const [newId, setNewId] = useState("");
+  const [nama, setNama] = useState("");
+  const [jabatan, setJabatan] = useState("");
+  const [email, setEmail] = useState("");
+
   const navigate = useNavigate();
 
   const merahTua = "#C21807";
@@ -17,103 +22,176 @@ const AdminValidId = () => {
   const fetchData = async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/admin/valid-ids");
+
       setList(Array.isArray(res.data.data) ? res.data.data : []);
     } catch (err) {
-      console.error("❌ Fetch error:", err);
+      console.error("Fetch error:", err);
       setList([]);
     }
   };
 
   const handleAdd = async () => {
-    if (!newId) return alert("Masukkan ID Karyawan!");
+    if (!newId || !nama || !jabatan) {
+      return alert("ID Karyawan, Nama dan Jabatan wajib diisi!");
+    }
+
     try {
       await axios.post("http://localhost:5000/api/admin/valid-ids", {
         idKaryawan: newId,
+        nama,
+        jabatan,
+        email,
       });
+
       setNewId("");
+      setNama("");
+      setJabatan("");
+      setEmail("");
+
       fetchData();
     } catch (err) {
-      console.error("❌ Add error:", err);
-      alert("Gagal menambahkan ID");
+      console.error(err);
+
+      alert(err.response?.data?.message || "Gagal menambahkan ID");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Yakin hapus ID ini?")) return;
+    if (!window.confirm("Yakin hapus data ini?")) return;
+
     try {
       await axios.delete(`http://localhost:5000/api/admin/valid-ids/${id}`);
+
       fetchData();
     } catch (err) {
-      console.error("❌ Delete error:", err);
-      alert("Gagal menghapus ID");
+      console.error(err);
+      alert("Gagal menghapus data");
     }
   };
 
-  const belumDipakai = list.filter((item) => !item.assigned);
-  const sudahRegistrasi = list.filter((item) => item.assigned);
+  const belumDipakai = list.filter((item) => item.status === "Belum Digunakan");
+
+  const sudahRegistrasi = list.filter(
+    (item) => item.status === "Sudah Digunakan",
+  );
 
   return (
     <div
       className="min-h-screen p-6"
-      style={{ backgroundColor: abuTua, color: "white" }}
+      style={{
+        backgroundColor: abuTua,
+        color: "white",
+      }}
     >
-      {/* Header */}
+      {/* Header */}{" "}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">🛠️ Admin Valid ID</h2>
+        {" "}
+        <h2 className="text-2xl font-bold">Admin Valid ID </h2>
         <button
           onClick={() => navigate("/admin")}
           className="px-4 py-2 rounded-lg shadow-md"
-          style={{ backgroundColor: merahTua, color: "white" }}
+          style={{
+            backgroundColor: merahTua,
+            color: "white",
+          }}
         >
-          ⬅ Keluar ke Dashboard
+          Dashboard
         </button>
       </div>
+      {/* Form Tambah */}
+      <div className="bg-white rounded-lg p-4 mb-6">
+        <div className="grid grid-cols-2 gap-3">
+          <input
+            type="text"
+            placeholder="ID Karyawan"
+            value={newId}
+            onChange={(e) => setNewId(e.target.value)}
+            className="px-3 py-2 border rounded"
+            style={{ color: "black" }}
+          />
 
-      {/* Form Tambah ID */}
-      <div className="flex gap-2 mb-6">
-        <input
-          type="text"
-          placeholder="Masukkan ID Karyawan (LSXXXXXXXXXX)"
-          value={newId}
-          onChange={(e) => setNewId(e.target.value)}
-          className="flex-1 px-3 py-2 rounded border"
-          style={{ color: "black" }}
-        />
+          <input
+            type="text"
+            placeholder="Nama Karyawan"
+            value={nama}
+            onChange={(e) => setNama(e.target.value)}
+            className="px-3 py-2 border rounded"
+            style={{ color: "black" }}
+          />
+
+          <input
+            type="text"
+            placeholder="Jabatan"
+            value={jabatan}
+            onChange={(e) => setJabatan(e.target.value)}
+            className="px-3 py-2 border rounded"
+            style={{ color: "black" }}
+          />
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="px-3 py-2 border rounded"
+            style={{ color: "black" }}
+          />
+        </div>
+
         <button
           onClick={handleAdd}
-          className="px-4 py-2 rounded"
-          style={{ backgroundColor: "#4CAF50", color: "white" }}
+          className="mt-4 px-4 py-2 rounded"
+          style={{
+            backgroundColor: "#4CAF50",
+            color: "white",
+          }}
         >
-          Tambah
+          Tambah Valid ID
         </button>
       </div>
-
-      {/* Table Belum Dipakai */}
-      <h3 className="text-lg font-semibold mb-2">
-        📝 ID Tambahan (Belum Registrasi)
-      </h3>
+      {/* Belum Digunakan */}
+      <h3 className="text-lg font-semibold mb-2">Belum Digunakan</h3>
       <div className="overflow-x-auto mb-8">
         <table className="w-full border-collapse">
-          <thead style={{ backgroundColor: merahTua }}>
+          <thead
+            style={{
+              backgroundColor: merahTua,
+            }}
+          >
             <tr>
               <th className="p-3 border">ID Karyawan</th>
+              <th className="p-3 border">Nama</th>
+              <th className="p-3 border">Jabatan</th>
+              <th className="p-3 border">Email</th>
               <th className="p-3 border">Status</th>
               <th className="p-3 border">Aksi</th>
             </tr>
           </thead>
+
           <tbody>
             {belumDipakai.length > 0 ? (
               belumDipakai.map((item) => (
                 <tr key={item._id} className="hover:bg-gray-700">
                   <td className="p-2 border">{item.idKaryawan}</td>
-                  <td className="p-2 border font-bold text-red-400">
-                    ❌ Belum dipakai
+
+                  <td className="p-2 border">{item.nama}</td>
+
+                  <td className="p-2 border">{item.jabatan}</td>
+
+                  <td className="p-2 border">{item.email}</td>
+
+                  <td className="p-2 border text-red-400 font-bold">
+                    {item.status}
                   </td>
+
                   <td className="p-2 border">
                     <button
                       onClick={() => handleDelete(item._id)}
                       className="px-3 py-1 rounded"
-                      style={{ backgroundColor: "#f44336", color: "white" }}
+                      style={{
+                        backgroundColor: "#f44336",
+                        color: "white",
+                      }}
                     >
                       Hapus
                     </button>
@@ -122,7 +200,7 @@ const AdminValidId = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="3" className="p-3 text-center text-gray-400">
+                <td colSpan="6" className="text-center p-4">
                   Tidak ada data
                 </td>
               </tr>
@@ -130,44 +208,44 @@ const AdminValidId = () => {
           </tbody>
         </table>
       </div>
-
-      {/* Table Sudah Registrasi */}
-      <h3 className="text-lg font-semibold mb-2">✅ Sudah Registrasi</h3>
+      {/* Sudah Digunakan */}
+      <h3 className="text-lg font-semibold mb-2">Sudah Digunakan</h3>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
-          <thead style={{ backgroundColor: merahTua }}>
+          <thead
+            style={{
+              backgroundColor: merahTua,
+            }}
+          >
             <tr>
-              <th className="p-3 border">Nama</th>
               <th className="p-3 border">ID Karyawan</th>
+              <th className="p-3 border">Nama</th>
+              <th className="p-3 border">Jabatan</th>
+              <th className="p-3 border">Email</th>
               <th className="p-3 border">Status</th>
-              <th className="p-3 border">Aksi</th>
             </tr>
           </thead>
+
           <tbody>
             {sudahRegistrasi.length > 0 ? (
               sudahRegistrasi.map((item) => (
                 <tr key={item._id} className="hover:bg-gray-700">
-                  <td className="p-2 border">
-                    {item.assignedTo ? item.assignedTo.nama : "-"}
-                  </td>
                   <td className="p-2 border">{item.idKaryawan}</td>
-                  <td className="p-2 border font-bold text-green-400">
-                    ✅ Dipakai
-                  </td>
-                  <td className="p-2 border">
-                    <button
-                      onClick={() => handleDelete(item._id)}
-                      className="px-3 py-1 rounded"
-                      style={{ backgroundColor: "#f44336", color: "white" }}
-                    >
-                      Hapus
-                    </button>
+
+                  <td className="p-2 border">{item.nama}</td>
+
+                  <td className="p-2 border">{item.jabatan}</td>
+
+                  <td className="p-2 border">{item.email}</td>
+
+                  <td className="p-2 border text-green-400 font-bold">
+                    {item.status}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="p-3 text-center text-gray-400">
+                <td colSpan="5" className="text-center p-4">
                   Tidak ada data
                 </td>
               </tr>

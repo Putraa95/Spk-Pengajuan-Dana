@@ -1,9 +1,6 @@
-// ================================================
-// ✅ Fungsi: hitungWP() — Disesuaikan untuk J&T
 
-// ================================================
 function hitungWP({ gaji, lamaKerja, tanggungan, nominal, tenor }) {
-  // 1️⃣ SKOR 1–5 SESUAI KONDISI NYATA DI J&T
+
   const skorGaji =
     gaji >= 7000000 ? 5 :
     gaji >= 5000000 ? 4 :
@@ -34,7 +31,6 @@ function hitungWP({ gaji, lamaKerja, tanggungan, nominal, tenor }) {
     tenor <= 18 ? 3 :
     tenor <= 24 ? 2 : 1;
 
-  // 2️⃣ BOBOT — DITEKAN DI Gaji & LamaKerja
   const bobot = {
     gaji: 0.35,
     lamaKerja: 0.25,
@@ -43,14 +39,14 @@ function hitungWP({ gaji, lamaKerja, tanggungan, nominal, tenor }) {
     tenor: 0.10,
   };
 
-  // 3️⃣ NORMALISASI
+
   const nGaji = skorGaji / 5;
   const nLamaKerja = skorLamaKerja / 5;
   const nTanggungan = skorTanggungan / 5;
   const nNominal = skorNominal / 5;
   const nTenor = skorTenor / 5;
 
-  // 4️⃣ HITUNG NILAI WP
+
   const hasil =
     Math.pow(nGaji, bobot.gaji) *
     Math.pow(nLamaKerja, bobot.lamaKerja) *
@@ -58,17 +54,17 @@ function hitungWP({ gaji, lamaKerja, tanggungan, nominal, tenor }) {
     Math.pow(nNominal, bobot.nominal) *
     Math.pow(nTenor, bobot.tenor);
 
-  // 5️⃣ PENYESUAIAN SKALA (biar rata-rata ~1.5)
+ 
   const hasilSkala = hasil * 3.2;
 
-  // 6️⃣ PENENTUAN STATUS — lebih longgar & realistis
+
   let statusWP = "";
   if (hasilSkala >= 2.5) statusWP = "Sangat Layak";
   else if (hasilSkala >= 1.5) statusWP = "Layak";
   else if (hasilSkala >= 1.0) statusWP = "Pertimbangkan";
   else statusWP = "Tidak Layak";
 
-  // 7️⃣ RETURN — langsung masuk MongoDB
+
   return {
     skor: { skorGaji, skorLamaKerja, skorTanggungan, skorNominal, skorTenor },
     normalisasi: { nGaji, nLamaKerja, nTanggungan, nNominal, nTenor },
