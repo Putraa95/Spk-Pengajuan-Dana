@@ -10,84 +10,93 @@ const router = express.Router();
  */
 router.post("/register", async (req, res) => {
   try {
-    const { idKaryawan, nama, password, role } = req.body;
+    const { idKaryawan, nama, password } = req.body;
 
     if (!idKaryawan || !nama || !password) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Semua field wajib diisi" });
-    }
-
-    const existing = await User.findOne({ idKaryawan });
-    if (existing) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "ID Karyawan sudah terdaftar" });
-    }
-
-    if (role === "admin") {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const newAdmin = new User({
-        idKaryawan,
-        nama,
-        password: hashedPassword,
-        role: "admin",
-      });
-      await newAdmin.save();
-
-      return res.status(201).json({
-        success: true,
-        msg: "Registrasi admin berhasil",
-        user: {
-          _id: newAdmin._id,
-          idKaryawan: newAdmin.idKaryawan,
-          nama: newAdmin.nama,
-          role: newAdmin.role,
-        },
+      return res.status(400).json({
+        success: false,
+        msg: "Semua field wajib diisi",
       });
     }
 
+    // Format ID
     if (!/^LS\d{10}$/.test(idKaryawan)) {
       return res.status(400).json({
         success: false,
-        msg: "❌ Format ID tidak valid (harus LS + 10 angka)",
+        msg: "Format ID Karyawan tidak valid",
       });
     }
 
-    const hashed = await bcrypt.hash(password, 10);
+    // Sudah punya akun?
+    const existingUser = await User.findOne({ idKaryawan });
+
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        msg: "ID Karyawan sudah terdaftar",
+      });
+    }
+
+    // Cari Valid ID
+    const validId = await ValidId.findOne({ idKaryawan });
+
+    if (!validId) {
+      return res.status(400).json({
+        success: false,
+        msg: "ID Karyawan tidak ditemukan pada data perusahaan",
+      });
+    }
+
+    // Sudah digunakan?
+    if (validId.status === "Sudah Digunakan") {
+      return res.status(400).json({
+        success: false,
+        msg: "ID Karyawan sudah pernah digunakan untuk registrasi",
+      });
+    }
+
+    // Cek nama (tidak peduli huruf besar kecil)
+    if (validId.nama.trim().toLowerCase() !== nama.trim().toLowerCase()) {
+      return res.status(400).json({
+        success: false,
+        msg: "Nama tidak sesuai dengan data perusahaan",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = await User.create({
       idKaryawan,
-      nama,
-      password: hashed,
+      nama: validId.nama,
+      jabatan: validId.jabatan,
+      email: validId.email,
+      password: hashedPassword,
       role: "karyawan",
     });
 
-    let validId = await ValidId.findOne({ idKaryawan });
-    if (!validId) {
-      validId = new ValidId({
-        idKaryawan,
-        assigned: true,
-        assignedTo: newUser._id,
-      });
-    } else {
-      validId.assigned = true;
-      validId.assignedTo = newUser._id;
-    }
+    validId.status = "Sudah Digunakan";
+    validId.assignedTo = newUser._id;
+
     await validId.save();
 
     return res.status(201).json({
       success: true,
-      msg: "✅ Registrasi karyawan berhasil & masuk ke Valid ID!",
+      msg: "Registrasi berhasil",
       user: {
         _id: newUser._id,
         idKaryawan: newUser.idKaryawan,
         nama: newUser.nama,
+        jabatan: newUser.jabatan,
         role: newUser.role,
       },
     });
   } catch (err) {
-    console.error("❌ Register error:", err);
-    return res.status(500).json({ success: false, msg: "Server error" });
+    console.error("Register Error:", err);
+
+    return res.status(500).json({
+      success: false,
+      msg: "Terjadi kesalahan pada server",
+    });
   }
 });
 
@@ -123,6 +132,8 @@ router.post("/login", async (req, res) => {
         _id: user._id,
         idKaryawan: user.idKaryawan,
         nama: user.nama,
+        jabatan: user.jabatan,
+        email: user.email,
         role: user.role,
       },
     });

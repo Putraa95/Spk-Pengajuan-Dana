@@ -9,11 +9,12 @@ const AdminValidId = () => {
   const [nama, setNama] = useState("");
   const [jabatan, setJabatan] = useState("");
   const [email, setEmail] = useState("");
+  const [noHp, setNoHp] = useState("");
 
   const navigate = useNavigate();
 
   const merahTua = "#C21807";
-  const abuTua = "#2E2E2E";
+  const abuTua = "#374151";
 
   useEffect(() => {
     fetchData();
@@ -41,12 +42,14 @@ const AdminValidId = () => {
         nama,
         jabatan,
         email,
+        noHp,
       });
 
       setNewId("");
       setNama("");
       setJabatan("");
       setEmail("");
+      setNoHp("");
 
       fetchData();
     } catch (err) {
@@ -77,7 +80,7 @@ const AdminValidId = () => {
 
   return (
     <div
-      className="min-h-screen p-6"
+      className="min-h-screen px-4 md:px-8 py-6"
       style={{
         backgroundColor: abuTua,
         color: "white",
@@ -99,43 +102,54 @@ const AdminValidId = () => {
         </button>
       </div>
       {/* Form Tambah */}
-      <div className="bg-white rounded-lg p-4 mb-6">
-        <div className="grid grid-cols-2 gap-3">
+      <div className="bg-gray-800 rounded-lg p-4 mb-6 w-full max-w-md">
+        <h3 className="text-xl font-bold text-red-400 text-center mb-6">
+          {" "}
+          ➕ Tambah Data Karyawan{" "}
+        </h3>
+        <div className="space-y-4">
+          {" "}
           <input
             type="text"
-            placeholder="ID Karyawan"
+            placeholder="🆔 ID Karyawan (LSxxxxxxxxxx)"
             value={newId}
             onChange={(e) => setNewId(e.target.value)}
-            className="px-3 py-2 border rounded"
-            style={{ color: "black" }}
-          />
-
+            className="w-full max-w-md bg-gray-700 rounded-xl p-5 mb-4 shadow-lg border "
+          />{" "}
           <input
             type="text"
-            placeholder="Nama Karyawan"
+            placeholder="👤 Nama Karyawan"
             value={nama}
             onChange={(e) => setNama(e.target.value)}
-            className="px-3 py-2 border rounded"
-            style={{ color: "black" }}
-          />
-
-          <input
-            type="text"
-            placeholder="Jabatan"
+            className="w-full max-w-md bg-gray-700 rounded-xl p-5 mb-6 shadow-lg border "
+          />{" "}
+          <select
             value={jabatan}
             onChange={(e) => setJabatan(e.target.value)}
-            className="px-3 py-2 border rounded"
-            style={{ color: "black" }}
-          />
-
+            className="w-full max-w-md bg-gray-700 rounded-xl p-5 mb-6 shadow-lg border "
+          >
+            {" "}
+            <option value="">💼 Pilih Jabatan</option>{" "}
+            <option value="Sales Reguler"> 🚚 Sales Reguler </option>{" "}
+            <option value="Sales Part Time"> ⏰ Sales Part Time </option>{" "}
+            <option value="Sales Pickup"> 📦 Sales Pickup </option>{" "}
+            <option value="Warehouse"> 🏭 Warehouse </option>{" "}
+            <option value="Transporter"> 🚛 Transporter </option>{" "}
+          </select>{" "}
           <input
             type="email"
-            placeholder="Email"
+            placeholder="📧 Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="px-3 py-2 border rounded"
-            style={{ color: "black" }}
-          />
+            className="w-full max-w-md bg-gray-700 rounded-xl p-5 mb-6 shadow-lg border "
+          />{" "}
+          <input
+            type="text"
+            placeholder="📱 Nomor Telepon"
+            value={noHp}
+            onChange={(e) => setNoHp(e.target.value)}
+            className="w-full max-w-md bg-gray-700 rounded-xl p-5 mb-6 shadow-lg border "
+          />{" "}
         </div>
 
         <button
@@ -151,108 +165,91 @@ const AdminValidId = () => {
       </div>
       {/* Belum Digunakan */}
       <h3 className="text-lg font-semibold mb-2">Belum Digunakan</h3>
-      <div className="overflow-x-auto mb-8">
-        <table className="w-full border-collapse">
-          <thead
-            style={{
-              backgroundColor: merahTua,
-            }}
-          >
-            <tr>
-              <th className="p-3 border">ID Karyawan</th>
-              <th className="p-3 border">Nama</th>
-              <th className="p-3 border">Jabatan</th>
-              <th className="p-3 border">Email</th>
-              <th className="p-3 border">Status</th>
-              <th className="p-3 border">Aksi</th>
-            </tr>
-          </thead>
+      <h3 className="text-lg font-semibold mb-3">
+        📝 Data Karyawan Belum Digunakan
+      </h3>
+      {!belumDipakai.length ? (
+        <div className="bg-gray-700 border border-gray-600 rounded-xl p-8 text-center mb-8">
+          <div className="text-5xl mb-3">📭</div>
 
-          <tbody>
-            {belumDipakai.length > 0 ? (
-              belumDipakai.map((item) => (
-                <tr key={item._id} className="hover:bg-gray-700">
-                  <td className="p-2 border">{item.idKaryawan}</td>
+          <h4 className="text-lg font-semibold text-white mb-2">
+            Tidak Ada Data
+          </h4>
+          <p className="text-gray-400">
+            Semua data karyawan sudah digunakan untuk registrasi.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          {belumDipakai.map((item) => (
+            <div
+              key={item._id}
+              className="bg-gray-700 border border-red-500 rounded-xl p-5 shadow-lg"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <h4 className="font-bold text-red-400">🆔 {item.idKaryawan}</h4>
 
-                  <td className="p-2 border">{item.nama}</td>
+                <span className="bg-red-500 text-white text-xs px-3 py-1 rounded-full">
+                  {item.status}
+                </span>
+              </div>
 
-                  <td className="p-2 border">{item.jabatan}</td>
+              <div className="space-y-2 text-white mb-4">
+                <p>👤 {item.nama}</p>
+                <p>💼 {item.jabatan}</p>
+                <p>📧 {item.email}</p>
+                <p>📱 {item.noHp || "-"}</p>
+              </div>
 
-                  <td className="p-2 border">{item.email}</td>
-
-                  <td className="p-2 border text-red-400 font-bold">
-                    {item.status}
-                  </td>
-
-                  <td className="p-2 border">
-                    <button
-                      onClick={() => handleDelete(item._id)}
-                      className="px-3 py-1 rounded"
-                      style={{
-                        backgroundColor: "#f44336",
-                        color: "white",
-                      }}
-                    >
-                      Hapus
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="text-center p-4">
-                  Tidak ada data
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              <button
+                onClick={() => handleDelete(item._id)}
+                className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg transition"
+              >
+                🗑️ Hapus Data
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
       {/* Sudah Digunakan */}
       <h3 className="text-lg font-semibold mb-2">Sudah Digunakan</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead
-            style={{
-              backgroundColor: merahTua,
-            }}
-          >
-            <tr>
-              <th className="p-3 border">ID Karyawan</th>
-              <th className="p-3 border">Nama</th>
-              <th className="p-3 border">Jabatan</th>
-              <th className="p-3 border">Email</th>
-              <th className="p-3 border">Status</th>
-            </tr>
-          </thead>
+      {!sudahRegistrasi.length ? (
+        <div className="bg-gray-700 border border-gray-600 rounded-xl p-8 text-center">
+          <div className="text-5xl mb-3">📭</div>
 
-          <tbody>
-            {sudahRegistrasi.length > 0 ? (
-              sudahRegistrasi.map((item) => (
-                <tr key={item._id} className="hover:bg-gray-700">
-                  <td className="p-2 border">{item.idKaryawan}</td>
+          <h4 className="text-lg font-semibold text-white mb-2">
+            Belum Ada Data
+          </h4>
 
-                  <td className="p-2 border">{item.nama}</td>
+          <p className="text-gray-400">
+            Belum ada karyawan yang melakukan registrasi.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {sudahRegistrasi.map((item) => (
+            <div
+              key={item._id}
+              className="bg-gray-700 border border-green-500 rounded-xl p-5 shadow-lg"
+            >
+              <div className="flex justify-between mb-4">
+                <h4 className="font-bold text-red-400">🆔 {item.idKaryawan}</h4>
 
-                  <td className="p-2 border">{item.jabatan}</td>
+                <span className="bg-green-500 text-white text-xs px-3 py-1 rounded-full">
+                  {item.status}
+                </span>
+              </div>
 
-                  <td className="p-2 border">{item.email}</td>
-
-                  <td className="p-2 border text-green-400 font-bold">
-                    {item.status}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="text-center p-4">
-                  Tidak ada data
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              <div className="space-y-2 text-white">
+                <p>👤 {item.nama}</p>
+                <p>💼 {item.jabatan}</p>
+                <p>📧 {item.email}</p>
+                <p>📱 {item.noHp || "-"}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

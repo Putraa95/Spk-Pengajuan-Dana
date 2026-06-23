@@ -21,6 +21,10 @@ const ValidIdSchema = new mongoose.Schema({
     type: String,
   },
 
+  noHp: {
+    type: String,
+  },
+
   status: {
     type: String,
     enum: ["Belum Digunakan", "Sudah Digunakan"],

@@ -30,50 +30,61 @@ router.get("/valid-ids", async (req, res) => {
   */
 router.post("/valid-ids", async (req, res) => {
   try {
-    const { idKaryawan, nama, jabatan, email } = req.body;
+    const { idKaryawan, nama, jabatan, email, noHp } = req.body;
 
-    if (!idKaryawan || !nama || !jabatan) {
+    // Validasi field wajib
+    if (
+      !idKaryawan?.trim() ||
+      !nama?.trim() ||
+      !jabatan?.trim() ||
+      !email?.trim() ||
+      !noHp?.trim()
+    ) {
       return res.status(400).json({
         success: false,
-        message: "ID Karyawan, Nama dan Jabatan wajib diisi",
+        message: "Semua field wajib diisi",
       });
     }
 
-    if (!/^LS\d{10}$/.test(idKaryawan)) {
+    // Validasi format ID
+    if (!/^LS\d{10}$/.test(idKaryawan.trim())) {
       return res.status(400).json({
         success: false,
         message: "Format ID tidak valid (contoh: LS0000104965)",
       });
     }
 
+    // Cek duplikasi
     const existing = await ValidId.findOne({
-      idKaryawan,
+      idKaryawan: idKaryawan.trim(),
     });
 
     if (existing) {
       return res.status(400).json({
         success: false,
-        message: "ID sudah terdaftar",
+        message: "ID Karyawan sudah terdaftar",
       });
     }
 
     const newId = await ValidId.create({
-      idKaryawan,
-      nama,
+      idKaryawan: idKaryawan.trim(),
+      nama: nama.trim(),
       jabatan,
-      email,
+      email: email.trim().toLowerCase(),
+      noHp: noHp.trim(),
       status: "Belum Digunakan",
       assignedTo: null,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Valid ID berhasil ditambahkan",
       data: newId,
     });
   } catch (err) {
     console.error("POST Valid ID Error:", err);
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Server error",
     });
@@ -88,7 +99,7 @@ router.put("/valid-ids/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { nama, jabatan, email, status } = req.body;
+    const { nama, jabatan, email, noHp, status } = req.body;
 
     const validId = await ValidId.findById(id);
 
@@ -104,6 +115,8 @@ router.put("/valid-ids/:id", async (req, res) => {
     if (jabatan !== undefined) validId.jabatan = jabatan;
 
     if (email !== undefined) validId.email = email;
+
+    if (noHp !== undefined) validId.noHp = noHp;
 
     if (status !== undefined) validId.status = status;
 

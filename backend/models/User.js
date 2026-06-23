@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
   jabatan: { type: String },
   role: { type: String, default: "karyawan" },
   email: { type: String },
+  noHp: { type: String },
   password: { type: String },
 });
 

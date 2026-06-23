@@ -31,6 +31,8 @@ function LoginKaryawan() {
         _id: res.data.user._id,
         idKaryawan: res.data.user.idKaryawan,
         nama: res.data.user.nama,
+        jabatan: res.data.user.jabatan,
+        email: res.data.user.email,
         role: res.data.user.role,
       };
       localStorage.setItem("user", JSON.stringify(userData));
